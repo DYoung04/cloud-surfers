@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cloud Surfers - serverless anomaly detection test environment
+
+Globals:
+  Function:
+    Runtime: python3.11
+    Timeout: 10
+    Tracing: Active
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref ItemsTable
+  Api:
+    TracingEnabled: true
+
+Resources:
+  ItemsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+
+  NormalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/normal/
+      Handler: app.handler
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: [dynamodb:GetItem, dynamodb:PutItem]
+              Resource: !GetAtt ItemsTable.Arn
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /items
+            Method: post
+
+  InjectionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/injection/
+      Handler: app.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ItemsTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /search
+            Method: post
+
+  PrivilegeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/privilege/
+      Handler: app.handler
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: [dynamodb:*]
+              Resource: '*'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /report
+            Method: get
+
+  DetectorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: detector/
+      Handler: detector.handler
+      Timeout: 60
+      Environment:
+        Variables:
+          LOOKBACK_MINUTES: "30"
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - logs:FilterLogEvents
+                - cloudtrail:LookupEvents
+                - cloudformation:DescribeStackResources
+              Resource: '*'
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(15 minutes)
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  TableName:
+    Value: !Ref ItemsTable
