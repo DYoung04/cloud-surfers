@@ -93,8 +93,7 @@ Resources:
           Properties:
             Schedule: rate(15 minutes)
 
-Outputs:
-  ApiUrl:
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
-  TableName:
-    Value: !Ref ItemsTable
+  CalculatorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/calculator/
