@@ -1,17 +1,25 @@
+"""POST /search - injection scenario.
+
+Deliberately vulnerable: the request body is passed straight into scan(),
+so the caller controls the query. The detector catches this from the logs.
+"""
+
 import json, os, time
 import boto3
 
 table = boto3.resource("dynamodb").Table(os.environ["TABLE_NAME"])
 
+
 def log_event(function, action, outcome, **extra):
     print(json.dumps({"ts": time.time(), "function": function,
                       "action": action, "outcome": outcome, **extra}))
+
 
 def handler(event, context):
     body = json.loads(event.get("body") or "{}")
     ip = event["requestContext"]["identity"]["sourceIp"]
     try:
-        # VULNERABLE ON PURPOSE: request body becomes scan() arguments
+        # Vulnerable on purpose: body becomes the scan() arguments.
         items = table.scan(**body).get("Items", [])
         log_event("injection", "scan", "ok", keys=list(body.keys()),
                   result_count=len(items), source_ip=ip)

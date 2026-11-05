@@ -94,6 +94,7 @@ def main():
     fns = function_names()
     alerts = []
     check_injection(read_logs(fns["InjectionFunction"], start), alerts)
+    check_injection(read_logs(fns["NotesFunction"], start), alerts)
     check_privilege_logs(read_logs(fns["PrivilegeFunction"], start), alerts)
     check_cloudtrail(start, alerts)
 

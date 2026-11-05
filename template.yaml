@@ -97,3 +97,56 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/calculator/
+      Handler: app.handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /calc
+            Method: get
+
+  NotesTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: id
+        Type: String
+
+  NotesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/notes/
+      Handler: app.handler
+      Environment:
+        Variables:
+          NOTES_TABLE: !Ref NotesTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref NotesTable
+        - Statement:
+            - Effect: Allow
+              Action: [dynamodb:PutItem]
+              Resource: !GetAtt NotesTable.Arn
+      Events:
+        Page:
+          Type: Api
+          Properties: { Path: /notesapp, Method: get }
+        List:
+          Type: Api
+          Properties: { Path: /notes, Method: get }
+        Add:
+          Type: Api
+          Properties: { Path: /notes, Method: post }
+        Search:
+          Type: Api
+          Properties: { Path: /notes/search, Method: post }
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  TableName:
+    Value: !Ref ItemsTable
+  CalculatorUrl:
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/calc"
+  NotesAppUrl:
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/notesapp"

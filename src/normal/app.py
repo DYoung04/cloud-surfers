@@ -1,11 +1,19 @@
+"""POST /items - normal baseline.
+
+Honest function: writes the item it's given, scoped to least privilege.
+Its logs are the reference for what normal traffic looks like.
+"""
+
 import json, os, time, uuid
 import boto3
 
 table = boto3.resource("dynamodb").Table(os.environ["TABLE_NAME"])
 
+
 def log_event(function, action, outcome, **extra):
     print(json.dumps({"ts": time.time(), "function": function,
                       "action": action, "outcome": outcome, **extra}))
+
 
 def handler(event, context):
     body = json.loads(event.get("body") or "{}")
