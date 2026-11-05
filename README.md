@@ -1,89 +1,154 @@
-# Course Final Projects
-## CSC 4913 / CSC 5573: Model Selection and Validation (Fall 2026)
-### Louisiana Tech University — Computer Science
+# Cloud Surfers: Runtime Anomaly Detection for Serverless Applications
 
-Welcome to the Course Final Project repository. This repository contains the complete dataset packages, data dictionaries, and problem statements for all five course projects.
+This repository contains the prototype for our CSC 452/552 research project on
+detecting runtime attacks in serverless (AWS Lambda) applications. The goal is not a
+new detection algorithm, but an experiment: we built a small, controlled AWS
+environment, generated normal and malicious traffic against it, and tested whether a
+lightweight Python detector that combines multiple AWS telemetry sources can reliably
+catch two common attack classes, **event injection** and **privilege abuse**.
 
----
+Everything described here is deployed as a single AWS SAM stack (`cloud-surfers`) in the
+`us-east-2` region. The environment is already running, so testing mostly means sending
+traffic to it and then checking what the detector reports.
 
-## 1. Project Directory & Topic Overview
+## Design overview
 
-| Topic # | Domain | Project Name | Folder Link |
-|:---:|:---|:---|:---|
-| **Topic 1** | Healthcare | **The "Best" Hospital Paradox** | [`Topic1_Healthcare_The_Best_Hospital_Paradox/`](./Topic1_Healthcare_The_Best_Hospital_Paradox/) |
-| **Topic 2** | Retail & Supply Chain | **The Empty Shelves Paradox** | [`Topic2_Supply_Chain_The_Empty_Shelves_Paradox/`](./Topic2_Supply_Chain_The_Empty_Shelves_Paradox/) |
-| **Topic 3** | Energy & Climate | **The "Green" Tech Carbon Spike** | [`Topic3_Climate_Energy_The_Green_Tech_Carbon_Spike/`](./Topic3_Climate_Energy_The_Green_Tech_Carbon_Spike/) |
-| **Topic 4** | Sports Analytics | **The "Unbeatable" Underdog** | [`Topic4_Sports_Analytics_The_Unbeatable_Underdog/`](./Topic4_Sports_Analytics_The_Unbeatable_Underdog/) |
-| **Topic 5** | Education | **The Tutoring Paradox** | [`Topic5_Education_The_Tutoring_Paradox/`](./Topic5_Education_The_Tutoring_Paradox/) |
+A client sends HTTP requests to an API Gateway endpoint, which triggers Lambda
+functions that read and write to a DynamoDB table. Three AWS services record what
+happens: CloudWatch Logs captures what each function did, X-Ray traces the request
+path, and CloudTrail records the AWS API calls each function's IAM role makes. A
+separate detector Lambda reads the logs and CloudTrail events on a schedule and raises
+alerts.
 
----
-
-## 2. Topic Summaries
-
-### Topic 1. Healthcare: The "Best" Hospital Paradox
-* **Domain**: Clinical Healthcare Informatics & Patient Acuity
-* **The Core Question**: Top research hospitals report higher raw mortality rates than small community clinics. Does an insurance algorithm correctly conclude that funding should be cut, or is this an artifact of patient illness severity, age, and inter-hospital transfer selection bias?
-* **Contents**: [`PROJECT.md`](./Topic1_Healthcare_The_Best_Hospital_Paradox/PROJECT.md), [`data/DATA_DICTIONARY.md`](./Topic1_Healthcare_The_Best_Hospital_Paradox/data/DATA_DICTIONARY.md), admissions, transfers, hospitals, diagnoses.
-
-### Topic 2. Supply Chain: The Empty Shelves Paradox
-* **Domain**: Grocery Point-of-Sale & Distribution Logistics
-* **The Core Question**: Big discount promotion weeks generate record foot traffic but paradoxically collapse profit margins and leave non-sale essentials out of stock. Is promotion strategy flawed, or is inventory delivery cadence and truck capacity the true operational bottleneck?
-* **Contents**: [`PROJECT.md`](./Topic2_Supply_Chain_The_Empty_Shelves_Paradox/PROJECT.md), [`data/DATA_DICTIONARY.md`](./Topic2_Supply_Chain_The_Empty_Shelves_Paradox/data/DATA_DICTIONARY.md), sales, inventory, orders, prices, products, stores.
-
-### Topic 3. Climate & Energy: The "Green" Tech Carbon Spike
-* **Domain**: Municipal Electric Grid & Decarbonization Policy
-* **The Core Question**: A city mandates 10,000 electric vehicles to reduce carbon emissions, yet city-wide emissions rise during the program year. What role do marginal power plant dispatch order, overnight home charging spikes, and seasonal temperature swings play in the emissions balance?
-* **Contents**: [`PROJECT.md`](./Topic3_Climate_Energy_The_Green_Tech_Carbon_Spike/PROJECT.md), [`data/DATA_DICTIONARY.md`](./Topic3_Climate_Energy_The_Green_Tech_Carbon_Spike/data/DATA_DICTIONARY.md), charging sessions, grid hourly dispatch, weather, fleet monthly stats, vehicles, stations.
-
-### Topic 4. Sports Analytics: The "Unbeatable" Underdog
-* **Domain**: NCAA College Basketball Performance Modeling
-* **The Core Question**: An algorithm predicts that a historically weak underdog team with an 85% regular season record will easily win the national championship over powerhouse teams. How do home-court bias, non-conference scheduling, and conference opponent strength explain the win rate?
-* **Contents**: [`PROJECT.md`](./Topic4_Sports_Analytics_The_Unbeatable_Underdog/PROJECT.md), [`data/DATA_DICTIONARY.md`](./Topic4_Sports_Analytics_The_Unbeatable_Underdog/data/DATA_DICTIONARY.md), box scores, regular season results, tournament results, preseason ratings, teams, conferences.
-
-### Topic 5. Education: The Tutoring Paradox
-* **Domain**: K-12 Educational Interventions & Academic Outcomes
-* **The Core Question**: Students who attend free after-school tutoring show higher course failure rates than non-attendees. Is the tutoring ineffective, or are referrals targeted at struggling students, combined with transportation and socioeconomic factors, masking the program's true value?
-* **Contents**: [`PROJECT.md`](./Topic5_Education_The_Tutoring_Paradox/PROJECT.md), [`data/DATA_DICTIONARY.md`](./Topic5_Education_The_Tutoring_Paradox/data/DATA_DICTIONARY.md), term grades, tutoring sessions, referrals, student demographics, courses, tutors, schools.
-
----
-
-## 3. Repository Structure
-
-Each project folder follows a standardized layout:
-```text
-Topic<N>_<Project_Name>/
-├── PROJECT.md               # Detailed problem background, motivation, and domain expert inputs
-└── data/
-    ├── DATA_DICTIONARY.md   # Complete schema and column documentation
-    ├── *.csv / *.csv.gz     # Primary datasets for analysis and modeling
-    └── *_sample.csv         # Small 20-row sample files for quick inspection
+```
+Client -> API Gateway -> Lambda functions -> DynamoDB
+                               |
+                               |-- CloudWatch Logs   (what each function did)
+                               |-- X-Ray             (request traces)
+                               '-- CloudTrail        (AWS API calls per IAM role)
+                                            |
+                                            '-> Detector Lambda (every 15 min) -> alerts
 ```
 
----
+Using more than one telemetry source is the central idea of the project. Injection
+attacks only appear in the function logs, because they never make an AWS API call.
+Privilege abuse appears in CloudTrail, because it does. Catching privilege abuse in
+both the logs and CloudTrail is what makes that detection stronger than a single-source
+approach would be.
 
-## 4. How to Use & Getting Started
+## Functions
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/CSC491-557/final-project.git
-   cd final-project
-   ```
+| Function | Endpoint | Role in the experiment |
+|---|---|---|
+| Normal | `POST /items` | Honest baseline, scoped to least privilege |
+| Injection | `POST /search` | Passes request input directly into a DynamoDB scan (vulnerable on purpose) |
+| Privilege | `GET /report` | Granted broader IAM permissions than it needs; a debug flag lists DynamoDB tables |
+| Notes | `GET /notesapp`, `/notes`, `POST /notes/search` | A realistic notes app carrying the same injection flaw |
+| Calculator | `GET /calc` | Generates benign traffic; holds no database permissions |
+| Detector | scheduled | Reads telemetry and reports anomalies |
 
-2. **Navigate to Your Assigned Topic**:
-   Check your team's assigned topic in `STUDENT_VM_ROSTER.md` or Canvas, then navigate into that folder.
+The vulnerable functions are intentionally insecure so that we have repeatable attack
+scenarios to measure against. They are not meant to represent good practice.
 
-3. **Working on the Lab Cluster VMs**:
-   * All datasets are also pre-staged in your VM's shared folder: `/home/groups/` and `/home/Fall2026 Share folder/`.
-   * Teammates on the same system share a common project workspace.
-   * Log your model runs and metrics to the hosted MLflow server at `http://10.0.100.20:5000` using your assigned student credentials.
+## Requirements
 
----
+- AWS CLI and AWS SAM CLI, authenticated to the project account (`us-east-2`)
+- Python 3.11
+- A terminal for `curl` (Git Bash on Windows)
 
-## 5. Course Project Milestones Schedule
+The only Python dependency is `boto3`, which the Lambda runtime already provides, so
+there is nothing to install for deployment.
 
-* **Milestone 1 (M1) — Frame**: Problem formulation, causal DAG formulation, and hypothesis definition.
-* **Milestone 2 (M2) — Explore & Focus**: Exploratory data analysis, data cleaning, sanity checks, and initial patterns.
-* **Milestone 3 (M3) — Select & Train**: Feature engineering, baseline model selection, MLflow experiment tracking.
-* **Milestone 4 (M4) — Evaluate & Validate**: Cross-validation, paradox resolution, bias-variance tradeoff, test set evaluation.
-* **Milestone 5 (M5) — Deliver**: Final model packaging, reproducible pipeline, and team presentation.
+## Deploying
 
+You only need to deploy if you change the code. From the project root:
+
+```
+sam build
+sam deploy
+```
+
+The API base URL is printed under Outputs after a successful deploy:
+
+```
+https://3x8jnnknvl.execute-api.us-east-2.amazonaws.com/Prod
+```
+
+## Running the tests
+
+Set the base URL once per terminal session:
+
+```
+API=https://3x8jnnknvl.execute-api.us-east-2.amazonaws.com/Prod
+```
+
+Generate normal traffic:
+
+```
+curl -X POST "$API/items" -d '{"id":"1","name":"apple"}'; echo
+curl "$API/calc?a=5&op=add&b=3"; echo
+```
+
+Run the attacks:
+
+```
+curl -X POST "$API/search" -d '{}'; echo          # injection, dumps the whole table
+curl -X POST "$API/notes/search" -d '{}'; echo     # injection through the notes app
+curl "$API/report?debug=tables"; echo              # privilege abuse, lists the tables
+```
+
+To see the attacks without the detector (the baseline, traditional-monitoring case),
+open the AWS console and read the raw telemetry yourself: CloudWatch for the function
+logs, and CloudTrail Event history filtered to the `ListTables` event for the privilege
+attack.
+
+To see the detector catch them, invoke it directly:
+
+```
+sam remote invoke DetectorFunction --stack-name cloud-surfers
+```
+
+It prints one alert per detected attack and otherwise runs on its own every 15 minutes.
+Note that it only looks back 30 minutes, so run it within a few minutes of the attacks
+or it will report nothing.
+
+## Detection rules
+
+The detector lives in `detector/detector.py`. The constants at the top of the file
+(the lookback window, the result-count threshold, the error limit, and the set of
+allowed API calls) are the experimental variables we tune when measuring detection rate
+against false positives.
+
+| Rule | Condition | Source |
+|---|---|---|
+| `injection-unexpected-keys` | A search request carries unexpected parameters, such as an empty filter that returns the whole table | CloudWatch Logs |
+| `error-burst` | Three or more failed searches from one IP, suggesting probing | CloudWatch Logs |
+| `role-unexpected-api-call` | A function's role makes an AWS API call outside its normal set, such as `ListTables` | CloudTrail |
+
+During development we found that Lambda's normal startup makes a `Decrypt` call that the
+detector first flagged as suspicious. Adding it to the allowed set reduced our false
+positives from three to zero, which is a small but concrete example of the
+detection-versus-false-positive tradeoff the project is meant to study.
+
+## Teardown
+
+To remove every resource the stack created:
+
+```
+sam delete --stack-name cloud-surfers
+```
+
+## Repository layout
+
+```
+cloud-surfers/
+├── template.yaml          # the full AWS stack, defined with SAM
+├── detector/
+│   └── detector.py        # the Python anomaly detector
+└── src/
+    ├── normal/app.py
+    ├── injection/app.py
+    ├── privilege/app.py
+    ├── notes/app.py
+    └── calculator/app.py
+```
