@@ -1,0 +1,104 @@
+
+import json
+import logging
+import os
+import time
+
+import boto3
+from botocore.exceptions import ClientError
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+s3 = boto3.client("s3")
+
+SUSPICIOUS_PATTERNS = (
+    "<script",
+    "' or '1'='1",
+    "../",
+    "union select",
+    "${",
+)
+
+
+def lambda_handler(event, context):
+    start = time.perf_counter()
+
+    metrics = {
+        "api_call_count": 0,
+        "access_denied_count": 0,
+        "error_count": 0,
+        "unexpected_target": 0,
+        "suspicious_input": 0,
+    }
+
+    status = "ok"
+
+    if not isinstance(event, dict):
+        status = "invalid_event"
+        metrics["error_count"] = 1
+
+    elif event.get("action") == "probe_protected_resource":
+        metrics["api_call_count"] = 1
+        metrics["unexpected_target"] = 1
+
+        try:
+            s3.head_object(
+                Bucket=os.environ["PROTECTED_BUCKET"],
+                Key=os.environ["PROTECTED_KEY"],
+            )
+            status = "unexpected_access_granted"
+            metrics["error_count"] = 1
+
+        except ClientError as exc:
+            code = exc.response["Error"]["Code"]
+            if code in ("403", "AccessDenied"):
+                metrics["access_denied_count"] = 1
+                status = "access_denied"
+            else:
+                status = "aws_error"
+                metrics["error_count"] = 1
+
+    else:
+        allowed_keys = {"action", "value", "request_id"}
+
+        if set(event) - allowed_keys:
+            metrics["unexpected_target"] = 1
+
+        value = event.get("value")
+
+        if not isinstance(value, str):
+            status = "invalid_input"
+            metrics["error_count"] = 1
+        else:
+            lower_value = value.lower()
+
+            metrics["suspicious_input"] = int(
+                any(p in lower_value for p in SUSPICIOUS_PATTERNS)
+            )
+
+            if event.get("action") != "process":
+                status = "invalid_action"
+                metrics["error_count"] = 1
+
+            elif metrics["suspicious_input"] or metrics["unexpected_target"]:
+                status = "rejected_input"
+                metrics["error_count"] = 1
+
+            else:
+                # Simulate ordinary processing with variable work.
+                result = sum(ord(ch) for ch in value)
+                status = "processed"
+
+    metrics["processing_ms"] = round(
+        (time.perf_counter() - start) * 1000, 3
+    )
+
+    response = {
+        "request_id": context.aws_request_id,
+        "status": status,
+        **metrics,
+    }
+
+    logger.info(json.dumps(response))
+    return response

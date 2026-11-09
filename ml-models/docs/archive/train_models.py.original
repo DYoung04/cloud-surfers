@@ -1,0 +1,30 @@
+import pandas as pd
+import joblib
+
+from pathlib import Path
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report, confusion_matrix
+
+X_train = pd.read_csv("data/X_train.csv")
+X_test = pd.read_csv("data/X_test.csv")
+
+y_train = pd.read_csv("data/processed/Y_train.csv").squeeze("columns")
+y_test = pd.read_csv("data/processed/Y_test.csv").squeeze("columns")
+
+features = [
+    "duration_ms",
+    "invocation_count",
+    "api_call_count",
+    "access_denied_count",
+    "error_count",
+    "unexpected_target",
+    "suspicious_input",
+]
+
+X_train = train[features]
+X_test = test[features]
+
+y_train = train["label"]
+y_test = test["label"]
