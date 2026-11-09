@@ -1,0 +1,28 @@
+{
+  "training_rows": 800,
+  "testing_rows": 200,
+  "features": [
+    "duration_ms",
+    "invocation_count",
+    "api_call_count",
+    "access_denied_count",
+    "error_count",
+    "unexpected_target",
+    "suspicious_input"
+  ],
+  "labels": [
+    "normal",
+    "event_injection",
+    "privilege_abuse"
+  ],
+  "training_class_counts": {
+    "normal": 480,
+    "privilege_abuse": 160,
+    "event_injection": 160
+  },
+  "testing_class_counts": {
+    "normal": 120,
+    "event_injection": 40,
+    "privilege_abuse": 40
+  }
+}

@@ -1,0 +1,142 @@
+[
+  {
+    "from": "runtime_dataset.csv",
+    "to": "data/raw/baseline/run_001/runtime_dataset.csv",
+    "sha256_before": "9ea2bd379ad7d74cc53d7ce689acdaa31803ddcace8b9766afe5b7a5a0764106"
+  },
+  {
+    "from": "log-analytics-results-2026-11-08.csv",
+    "to": "data/raw/baseline/run_001/log-analytics-results-2026-11-08.csv",
+    "sha256_before": "66c98ec353d6cf8007573608724e657240af912baef9c691b9cd9e2ad5cc8507"
+  },
+  {
+    "from": "runtime_dataset_logistic_regression.csv",
+    "to": "data/raw/logistic_regression/run_001/runtime_dataset_logistic_regression.csv",
+    "sha256_before": "75e2216bff8d6a25766256598ad6b1df237ed8cc761343c4a202bb6597a65a72"
+  },
+  {
+    "from": "log-analytics-results-2026-11-09.csv",
+    "to": "data/raw/logistic_regression/run_001/log-analytics-results-2026-11-09.csv",
+    "sha256_before": "5dffea17e9f71fd5f91011afe009813a6cd79b093c0c9d097b5f544b8286ba5f"
+  },
+  {
+    "from": "data/raw/invocations.csv",
+    "to": "data/raw/training/invocations.csv",
+    "sha256_before": "4212340041de4d3bab4c19cc809f6f88823520a925b1dddd390a06e0928f5752"
+  },
+  {
+    "from": "lambda_dataset.csv",
+    "to": "docs/schemas/lambda_dataset.csv",
+    "sha256_before": "9752f206e57403dca4aefc29317072f3cd4267422d88812e598481913fdbb90f"
+  },
+  {
+    "from": "detector.py",
+    "to": "src/runtime_detector/detector.py",
+    "sha256_before": "6c9029ac42be3c18c24758f9cb86e93d9cfee6845bf2f6f8c42ee6ca1f5c5927"
+  },
+  {
+    "from": "invocation_counter.py",
+    "to": "src/runtime_detector/invocation_counter.py",
+    "sha256_before": "7bc28fe998dc5f779fdd44c88d73dad2b777e05055de01622ef9047c5feb872e"
+  },
+  {
+    "from": "train_models.py",
+    "to": "src/runtime_detector/training.py",
+    "sha256_before": "2b86d478000d3505b46d21bedd8d5152442d564e67c0b63cffd65de5e1a50d8b"
+  },
+  {
+    "from": "scripts/preprocess.py",
+    "to": "src/runtime_detector/preprocessing.py",
+    "sha256_before": "bf1b388de806d96e9aa8aad8326cc05341a3ff8bcc50b0b39633e159f5df9cdc"
+  },
+  {
+    "from": "extract_lambda_dataset.py",
+    "to": "src/runtime_detector/extraction.py",
+    "sha256_before": "dfa28c6f437714717590b20f4f6fb5616af8db44e6daba9c929c027088c0bab6"
+  },
+  {
+    "from": "validate_dataset.py",
+    "to": "src/runtime_detector/validation.py",
+    "sha256_before": "39d9927551f09e07679f88825cefe1fa3310788032b9d0623ae258831a5868ea"
+  },
+  {
+    "from": "generate_dataset.py",
+    "to": "scripts/generate_dataset.py",
+    "sha256_before": "54e4dd5deeab35c539c0599b3ab28c84ddd9068505574286d6b4b624e7c52cc2"
+  },
+  {
+    "from": "lambda_function.py",
+    "to": "deployment/lambda_function.py",
+    "sha256_before": "465868b914273f34432e1e1660bb8dc4f8e42baceb66f828cf0794c8d7089ee5"
+  },
+  {
+    "from": "original_application.py",
+    "to": "deployment/original_application.py",
+    "sha256_before": "4c95437a53fa01c4db12e1429f9d3495d4f10740b63666521e721f2ce3e93fbb"
+  },
+  {
+    "from": "original_application.py.original",
+    "to": "docs/archive/original_application.py.original",
+    "sha256_before": "9e22293905e9be9a4335771e225462b819bf1c47efd4ddb31fcdf3179e5756be"
+  },
+  {
+    "from": "train_models.py.original",
+    "to": "docs/archive/train_models.py.original",
+    "sha256_before": "579727aaff291e772a34439df7f957628de4b1c06169347e71e82c59a04a58a0"
+  },
+  {
+    "from": "open-key-for-testing.txt",
+    "to": ".local/open-key-for-testing.txt",
+    "sha256_before": "b3cef249c50f7e26254ffd91bc7453d7424247cc98c372840e70297060c0e146"
+  },
+  {
+    "from": "models/scaler.joblib",
+    "to": "models/training_run_001/scaler.joblib",
+    "sha256_before": "10ab8a9ab99d01935e4dbf2d2fadb6158ad9b54d8a47449fb26d0d5ce38902ac"
+  },
+  {
+    "from": "models/logistic_regression.joblib",
+    "to": "models/training_run_001/logistic_regression.joblib",
+    "sha256_before": "b8ba18dcdf77b7f24b1c7a96ebf6ff7aba2ac261690e8d2bee326581a634f09f"
+  },
+  {
+    "from": "models/decision_tree.joblib",
+    "to": "models/training_run_001/decision_tree.joblib",
+    "sha256_before": "e162b38e911b3d0568970360809b0a4045fc3547557d4de20b4cfa0ca5d5bb70"
+  },
+  {
+    "from": "models/feature_names.joblib",
+    "to": "models/training_run_001/feature_names.joblib",
+    "sha256_before": "ec2c80b7e3bac49a1eb33db22ad3cc2d6cb662a154a9105cb311c64aa376c7dd"
+  },
+  {
+    "from": "results/decision_tree_confusion_matrix.csv",
+    "to": "experiments/training/training_run_001/decision_tree_confusion_matrix.csv",
+    "sha256_before": "58788e620488144ccc0b3b8ecc9eb3037ea146a07f22a801748dbec85e0f7719"
+  },
+  {
+    "from": "results/decision_tree_metrics.csv",
+    "to": "experiments/training/training_run_001/decision_tree_metrics.csv",
+    "sha256_before": "71a731f163934d10be9cadb4039f81d3153c5a524dc1088be9c0df702a5c964b"
+  },
+  {
+    "from": "results/predictions.csv",
+    "to": "experiments/training/training_run_001/predictions.csv",
+    "sha256_before": "529877a2902cfb876d81e335907caa7838f94aae0d6ec40e44f152f288df4435"
+  },
+  {
+    "from": "results/logistic_regression_metrics.csv",
+    "to": "experiments/training/training_run_001/logistic_regression_metrics.csv",
+    "sha256_before": "71a731f163934d10be9cadb4039f81d3153c5a524dc1088be9c0df702a5c964b"
+  },
+  {
+    "from": "results/training_summary.json",
+    "to": "experiments/training/training_run_001/training_summary.json",
+    "sha256_before": "a46c4ec04a1f80f28d0e29654c05b2ef5bd3c17d1d63598269ece28bb41420b1"
+  },
+  {
+    "from": "results/logistic_regression_confusion_matrix.csv",
+    "to": "experiments/training/training_run_001/logistic_regression_confusion_matrix.csv",
+    "sha256_before": "58788e620488144ccc0b3b8ecc9eb3037ea146a07f22a801748dbec85e0f7719"
+  }
+]

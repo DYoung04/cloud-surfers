@@ -1,0 +1,37 @@
+{
+  "training_rows": 800,
+  "testing_rows": 200,
+  "features": [
+    "duration_ms",
+    "invocation_count",
+    "api_call_count",
+    "access_denied_count",
+    "error_count",
+    "unexpected_target",
+    "suspicious_input"
+  ],
+  "labels": [
+    "normal",
+    "event_injection",
+    "privilege_abuse"
+  ],
+  "training_class_counts": {
+    "normal": 480,
+    "privilege_abuse": 160,
+    "event_injection": 160
+  },
+  "testing_class_counts": {
+    "normal": 120,
+    "event_injection": 40,
+    "privilege_abuse": 40
+  },
+  "run_id": "training_run_001",
+  "source_results": "experiments/training/training_run_001",
+  "notes": "Existing artifacts relocated without retraining; original training timestamp and exact training commit were not recorded.",
+  "artifact_sha256": {
+    "scaler.joblib": "10ab8a9ab99d01935e4dbf2d2fadb6158ad9b54d8a47449fb26d0d5ce38902ac",
+    "logistic_regression.joblib": "b8ba18dcdf77b7f24b1c7a96ebf6ff7aba2ac261690e8d2bee326581a634f09f",
+    "decision_tree.joblib": "e162b38e911b3d0568970360809b0a4045fc3547557d4de20b4cfa0ca5d5bb70",
+    "feature_names.joblib": "ec2c80b7e3bac49a1eb33db22ad3cc2d6cb662a154a9105cb311c64aa376c7dd"
+  }
+}

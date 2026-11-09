@@ -1,0 +1,16 @@
+{
+  "region": "us-east-1",
+  "function_name": "runtime-test-function",
+  "window_seconds": 60,
+  "scenario_counts": {
+    "normal": 600,
+    "event_injection": 200,
+    "privilege_abuse": 200
+  },
+  "experiment_groups": [
+    "baseline",
+    "logistic_regression",
+    "decision_tree"
+  ],
+  "note": "Recorded setup; verify deployed MODEL_NAME and AWS settings before each run. This file does not configure AWS."
+}

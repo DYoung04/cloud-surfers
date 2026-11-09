@@ -1,0 +1,15 @@
+{
+  "run_id": "training_run_001",
+  "evaluation": "offline held-out test",
+  "models": "models/training_run_001",
+  "input_dataset": "data/raw/training/invocations.csv",
+  "split_sha256": {
+    "data/processed/X_train.csv": "bf90e0bcace2db980d08aa7ae3bba9e03693e35df7fd77bfcdb7458447816391",
+    "data/processed/y_train.csv": "ae77485117f0a02736d2ff3f87101b5eea82234b58d1a288536dcb0871cf75b6",
+    "data/processed/y_test.csv": "4b1be55039c4f18a4a525635c479bae923981990c606773900af3adb8ac5810a",
+    "data/processed/X_test.csv": "aa42f1da06d071456aa63062a9c09b956a4d300a9a88e018a0a95b27a1a0414b"
+  },
+  "original_training_commit": null,
+  "training_rows": 800,
+  "testing_rows": 200
+}

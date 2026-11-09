@@ -1,0 +1,19 @@
+{
+  "run_id": "run_001",
+  "experiment": "baseline",
+  "raw_directory": "data/raw/baseline/run_001",
+  "records": 1000,
+  "first_client_timestamp": "2026-11-08T02:20:53.803954+00:00",
+  "last_client_timestamp": "2026-11-08T02:24:31.803074+00:00",
+  "scenario_counts": {
+    "event_injection": 200,
+    "normal": 600,
+    "privilege_abuse": 200
+  },
+  "inputs_sha256": {
+    "runtime_dataset.csv": "9ea2bd379ad7d74cc53d7ce689acdaa31803ddcace8b9766afe5b7a5a0764106",
+    "log-analytics-results-2026-11-08.csv": "66c98ec353d6cf8007573608724e657240af912baef9c691b9cd9e2ad5cc8507"
+  },
+  "original_execution_commit": null,
+  "notes": "Provenance reconstructed from existing files; unrecorded original settings are not inferred."
+}

@@ -1,0 +1,20 @@
+{
+  "run_id": "run_001",
+  "experiment": "logistic_regression",
+  "raw_directory": "data/raw/logistic_regression/run_001",
+  "records": 1000,
+  "first_client_timestamp": "2026-11-09T13:41:33.114533+00:00",
+  "last_client_timestamp": "2026-11-09T13:44:59.430497+00:00",
+  "scenario_counts": {
+    "event_injection": 200,
+    "normal": 600,
+    "privilege_abuse": 200
+  },
+  "inputs_sha256": {
+    "runtime_dataset_logistic_regression.csv": "75e2216bff8d6a25766256598ad6b1df237ed8cc761343c4a202bb6597a65a72",
+    "log-analytics-results-2026-11-09.csv": "5dffea17e9f71fd5f91011afe009813a6cd79b093c0c9d097b5f544b8286ba5f"
+  },
+  "original_execution_commit": null,
+  "notes": "Provenance reconstructed from existing files; unrecorded original settings are not inferred.",
+  "model_run": "training_run_001"
+}
